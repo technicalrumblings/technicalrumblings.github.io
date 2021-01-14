@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+    <!-- Head -->
+    <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="author" content="Hackin Allowance">
+    <meta name="description" itemprop="description" content="Tech stuff and hacks. Mostly for documentation purposes.">
+    <meta name="keywords" content="">
+
+    <!-- Page Title -->
+    
+        <title>Civilization classic Ghidra Memory Map | Technical Rumblings</title>
+    
+    <link rel="icon" href="/img/avatar-default.png">
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    
+    
+<script src="/js/script.js"></script>
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    
+    <style>
+        .deactiveColor{
+            color: #37474f;
+        }
+        .activeColor{
+            color: #006064;
+        }
+        a:hover{
+            color: #006064;
+        }
+        .header-btn{
+            color: #37474f;
+        }
+        
+        .post-content img{
+            margin: 50px auto;
+        }
+        
+    </style>
+<meta name="generator" content="Hexo 5.3.0"></head>
+    <body>
+        <div class="container">
+
+            <!-- Top Anchor -->
+            <div id="top"></div>
+
+            <!-- Header -->
+            <header class="header-wrapper">
+    <div class="header-title-wrapper">
+        <!-- Page Title -->
+        <p class="header-title">
+             
+                
+                    Civilization classic Ghidra Memory Map
+                
+            
+        </p>  
+    </div>    
+
+    
+        <!-- Division Line -->
+        <div class="division"></div> 
+    
+    
+    <div class="header-detail">
+        <!-- Header Button -->
+        <div class="header-btn-wrapper">
+            
+                <span>
+                    <a class="home-btn header-btn" href="/" title="homepage"><i class="fa fa-home"></i></a>
+                </span>
+
+                
+                    <span>
+                        <a class="catalog-btn header-btn"><i class="fa fa-list-ul"></i></a>
+                    </span>
+                
+            
+        </div>
+    </div>
+</header>
+
+            <!-- Main -->
+            <main>
+                <article class="post-wrapper">
+    
+
+    
+        <!-- Article Catalog -->
+        <div class="catalog-dropdown col-xs-12 col-sm-12">
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Output-of-DOS-MCBS"><span class="toc-number">1.</span> <span class="toc-text">Output of DOS MCBS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Sample-command-to-grab-memory-dump-that-can-be-imported-to-Ghidra"><span class="toc-number">2.</span> <span class="toc-text">Sample command to grab memory dump that can be imported to Ghidra</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Reference-to-IDA-Pro"><span class="toc-number">3.</span> <span class="toc-text">Reference to IDA Pro</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#More-on-the-segments-calculation"><span class="toc-number">4.</span> <span class="toc-text">More on the segments calculation</span></a></li></ol>
+        </div>
+    
+
+    
+        <!--For now, Lightbox Only Show in Post Layout -->
+        
+
+        
+        
+            <!-- Article Img Lightbox -->
+            <div class="gallery">
+    
+    
+    <div class="lightbox">
+        <!-- Close Button -->
+        <span class="close-gallery">&times;</span>
+        
+        <!-- Photo -->
+        <img class="gallery-photo">
+    </div>
+</div>
+        
+    
+
+    
+
+    <!-- Article Content -->
+    <div class="post-content">
+        <p>This is the map for the memory dump of MSDOS version of Civilization Classic (474.04). Memory dump was captured from Dosbox-x (version dosbox-x-macosx-x64-20190301171645).<br><em>Note:</em> there can be differences in more recent version of DosBox-x with the .exe start address, i.e. where the seg000 is mapped. This has to be adjusted in IDA Pro and Ghidra<br><img src="civilization-ghidra-memory-map.png"><br>Memory dump taken using Dosbox-x debugger<br><code>DOS MCBS                  - Show Memory Control Block chain.</code><br><code>MEMDUMPBIN [s]:[o] [len]  - Write memory to file memdump.bin.</code></p>
+<h2 id="Output-of-DOS-MCBS"><a href="#Output-of-DOS-MCBS" class="headerlink" title="Output of DOS MCBS"></a>Output of DOS MCBS</h2><p><img src="dos-mcbs.png"><br><em>Note:</em> len is decimal</p>
+<h2 id="Sample-command-to-grab-memory-dump-that-can-be-imported-to-Ghidra"><a href="#Sample-command-to-grab-memory-dump-that-can-be-imported-to-Ghidra" class="headerlink" title="Sample command to grab memory dump that can be imported to Ghidra"></a>Sample command to grab memory dump that can be imported to Ghidra</h2><p><code>MEMDUMBIN 01e8:0000 909681</code></p>
+<h2 id="Reference-to-IDA-Pro"><a href="#Reference-to-IDA-Pro" class="headerlink" title="Reference to IDA Pro"></a>Reference to IDA Pro</h2><p>Segments have been mapped to reflect what can be seen in IDA Pro. IDA Pro splits code to segments automatically, it just needs right base. Maps in both programs, adjusted to start at base segment 0308, to allow seamless cross reference between Dosbox-x debugger, Ghidra and IDA Pro.<br><img src="ida-pro-segments.png"><br>*Note: IDA Pro references CIV_UNP.EXE which is CIV.EXE unpacked.</p>
+<h2 id="More-on-the-segments-calculation"><a href="#More-on-the-segments-calculation" class="headerlink" title="More on the segments calculation"></a>More on the segments calculation</h2><p>How did we come up with 0x0308 for the base segmentexactly if CIV starts at 02F7 as per DOS MCBS?<br>This has to do with the fact that 0x3080-0x2f70=0x110 bytes is some junk that I don’t understand at the moment and actual assembly instructions start at 0x308.<br><em>Note:</em> Segment address has to be multiplied by 0x10 to get the absolute memory address</p>
+  
+    </div> 
+
+    
+        <!-- Division Line -->
+        <div class="division"></div> 
+    
+
+    <div class="post-info-wrapper">
+            
+                    <!-- Post Info -->
+                    <p class="post-date">2021-01-04</p>
+                    
+                    
+                        <p class="post-info-categories">
+                            
+                        </p>
+                    
+
+                    
+            
+    </div>
+</article>
+
+
+    
+
+            </main>
+
+            <!-- 'To Top' Btn-->
+            
+                <div id="to-top">
+    <a href="#top" class="toTop">
+        <i class="fa fa-pagelines"></i>
+    </a>
+</div>
+            
+
+            <!-- Footer -->
+            
+                <footer class="footer-wrapper col-xs-12 col-sm-12">
+    <div class="footer-banner-wrapper">
+        <p class="footer-banner">Powered by <a target="_blank" rel="noopener" href="https://hexo.io/" title="Hexo">Hexo</a></p>
+        <P class="footer-banner">Theme <a target="_blank" rel="noopener" href="https://github.com/Lonezj/hexo-theme-wind" title="Wind">wind</a></P>
+    </div>
+</footer>
+            
+        </div>
+
+        <link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css">
+        <link rel="stylesheet" href="/css/google-prettify-monokai.css" type="text/css">
+        <script src="//cdn.bootcss.com/prettify/r298/prettify.min.js" type="text/javascript"></script>
+    </body>
+</html>

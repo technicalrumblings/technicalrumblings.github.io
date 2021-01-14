@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+    <!-- Head -->
+    <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="author" content="Hackin Allowance">
+    <meta name="description" itemprop="description" content="Tech stuff and hacks. Mostly for documentation purposes.">
+    <meta name="keywords" content="">
+
+    <!-- Page Title -->
+    
+        <title>Unbound with local energized blacklist and TLS forward to NextDNS | Technical Rumblings</title>
+    
+    <link rel="icon" href="/img/avatar-default.png">
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    
+    
+<script src="/js/script.js"></script>
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    
+    <style>
+        .deactiveColor{
+            color: #37474f;
+        }
+        .activeColor{
+            color: #006064;
+        }
+        a:hover{
+            color: #006064;
+        }
+        .header-btn{
+            color: #37474f;
+        }
+        
+        .post-content img{
+            margin: 50px auto;
+        }
+        
+    </style>
+<meta name="generator" content="Hexo 5.3.0"></head>
+    <body>
+        <div class="container">
+
+            <!-- Top Anchor -->
+            <div id="top"></div>
+
+            <!-- Header -->
+            <header class="header-wrapper">
+    <div class="header-title-wrapper">
+        <!-- Page Title -->
+        <p class="header-title">
+             
+                
+                    Unbound with local energized blacklist and TLS forward to NextDNS
+                
+            
+        </p>  
+    </div>    
+
+    
+        <!-- Division Line -->
+        <div class="division"></div> 
+    
+    
+    <div class="header-detail">
+        <!-- Header Button -->
+        <div class="header-btn-wrapper">
+            
+                <span>
+                    <a class="home-btn header-btn" href="/" title="homepage"><i class="fa fa-home"></i></a>
+                </span>
+
+                
+                    <span>
+                        <a class="catalog-btn header-btn"><i class="fa fa-list-ul"></i></a>
+                    </span>
+                
+            
+        </div>
+    </div>
+</header>
+
+            <!-- Main -->
+            <main>
+                <article class="post-wrapper">
+    
+
+    
+        <!-- Article Catalog -->
+        <div class="catalog-dropdown col-xs-12 col-sm-12">
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Working-configuration-for-download"><span class="toc-number">1.</span> <span class="toc-text">Working configuration for download</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Install-Unbound-on-FREEBSD"><span class="toc-number">2.</span> <span class="toc-text">Install Unbound on FREEBSD</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Edit-configuration-all-below-entries-go-under-server-directive"><span class="toc-number">3.</span> <span class="toc-text">Edit configuration - all below entries go under server: directive</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Configure-chroot"><span class="toc-number">3.1.</span> <span class="toc-text">Configure chroot</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TLS-cert-bundle"><span class="toc-number">3.2.</span> <span class="toc-text">TLS cert bundle</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Caching-TTLs"><span class="toc-number">3.3.</span> <span class="toc-text">Caching TTLs</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Local-blacklist-zone-file"><span class="toc-number">3.4.</span> <span class="toc-text">Local blacklist zone file</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Forwarding-address"><span class="toc-number">3.5.</span> <span class="toc-text">Forwarding address</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Enable-remote-control"><span class="toc-number">4.</span> <span class="toc-text">Enable remote control</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#In-its-own-remote-control-section"><span class="toc-number">4.1.</span> <span class="toc-text">In its own remote-control: section</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Controling-unbound"><span class="toc-number">5.</span> <span class="toc-text">Controling unbound</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#restart"><span class="toc-number">5.1.</span> <span class="toc-text">restart</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#flush-zone"><span class="toc-number">5.2.</span> <span class="toc-text">flush zone</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#dump-cache"><span class="toc-number">5.3.</span> <span class="toc-text">dump cache</span></a></li></ol></li></ol>
+        </div>
+    
+
+    
+        <!--For now, Lightbox Only Show in Post Layout -->
+        
+
+        
+        
+            <!-- Article Img Lightbox -->
+            <div class="gallery">
+    
+    
+    <div class="lightbox">
+        <!-- Close Button -->
+        <span class="close-gallery">&times;</span>
+        
+        <!-- Photo -->
+        <img class="gallery-photo">
+    </div>
+</div>
+        
+    
+
+    
+
+    <!-- Article Content -->
+    <div class="post-content">
+        <h2 id="Working-configuration-for-download"><a href="#Working-configuration-for-download" class="headerlink" title="Working configuration for download"></a>Working configuration for download</h2><p><img src="unbound.conf"></p>
+<h2 id="Install-Unbound-on-FREEBSD"><a href="#Install-Unbound-on-FREEBSD" class="headerlink" title="Install Unbound on FREEBSD"></a>Install Unbound on FREEBSD</h2><pre><code>pkg install unbound</code></pre>
+
+<h2 id="Edit-configuration-all-below-entries-go-under-server-directive"><a href="#Edit-configuration-all-below-entries-go-under-server-directive" class="headerlink" title="Edit configuration - all below entries go under server: directive"></a>Edit configuration - all below entries go under server: directive</h2><pre><code>vim &#x2F;usr&#x2F;local&#x2F;etc&#x2F;unbound&#x2F;unbound.conf</code></pre>
+
+<h3 id="Configure-chroot"><a href="#Configure-chroot" class="headerlink" title="Configure chroot"></a>Configure chroot</h3><blockquote><p>directory: /usr/local/etc/unbound<br>chroot: /usr/local/etc/unbound</p>
+</blockquote>
+<h3 id="TLS-cert-bundle"><a href="#TLS-cert-bundle" class="headerlink" title="TLS cert bundle"></a>TLS cert bundle</h3><blockquote><p>tls-cert-bundle: /usr/local/share/certs/ca-root-nss.crt</p>
+</blockquote>
+
+<h3 id="Caching-TTLs"><a href="#Caching-TTLs" class="headerlink" title="Caching TTLs"></a>Caching TTLs</h3><blockquote><p>cache-min-ttl: 72000<br>cache-max-ttl: 86400</p>
+</blockquote>
+<h3 id="Local-blacklist-zone-file"><a href="#Local-blacklist-zone-file" class="headerlink" title="Local blacklist zone file"></a>Local blacklist zone file</h3><p>Download energized list from <a target="_blank" rel="noopener" href="https://github.com/EnergizedProtection/block">https://github.com/EnergizedProtection/block</a></p>
+<blockquote><p>wget <a target="_blank" rel="noopener" href="https://block.energized.pro/ultimate/formats/unbound.conf">https://block.energized.pro/ultimate/formats/unbound.conf</a></p>
+</blockquote>
+<p><em>Note:</em> - blacklist needs tweaking i.e. some entries need to be removed</p>
+<blockquote><p>include: /usr/local/etc/unbound/energized-ultimate.blacklist</p>
+</blockquote>
+
+<h3 id="Forwarding-address"><a href="#Forwarding-address" class="headerlink" title="Forwarding address"></a>Forwarding address</h3><blockquote><p>forward-zone:<br>    name:”.”<br>    forward-tls-upstream: yes<br>    forward-addr: 45.90.28.0@853#<yourcode>.dns1.nextdns.io</p>
+</blockquote>
+
+<h2 id="Enable-remote-control"><a href="#Enable-remote-control" class="headerlink" title="Enable remote control"></a>Enable remote control</h2><h3 id="In-its-own-remote-control-section"><a href="#In-its-own-remote-control-section" class="headerlink" title="In its own remote-control: section"></a>In its own remote-control: section</h3><pre><code>remote-control:
+    control-enable: yes
+    control-use-cert: no</code></pre>
+<h2 id="Controling-unbound"><a href="#Controling-unbound" class="headerlink" title="Controling unbound"></a>Controling unbound</h2><h3 id="restart"><a href="#restart" class="headerlink" title="restart"></a>restart</h3><blockquote><p>service unbound restart</p>
+</blockquote>
+
+<h3 id="flush-zone"><a href="#flush-zone" class="headerlink" title="flush zone"></a>flush zone</h3><blockquote><p>unbound-control flush_zone youtube.com</p>
+</blockquote>
+
+<h3 id="dump-cache"><a href="#dump-cache" class="headerlink" title="dump cache"></a>dump cache</h3><blockquote><p>unbound-control dump_cache</p>
+</blockquote>
+
+
+  
+    </div> 
+
+    
+        <!-- Division Line -->
+        <div class="division"></div> 
+    
+
+    <div class="post-info-wrapper">
+            
+                    <!-- Post Info -->
+                    <p class="post-date">2021-01-07</p>
+                    
+                    
+                        <p class="post-info-categories">
+                            
+                        </p>
+                    
+
+                    
+            
+    </div>
+</article>
+
+
+    
+
+            </main>
+
+            <!-- 'To Top' Btn-->
+            
+                <div id="to-top">
+    <a href="#top" class="toTop">
+        <i class="fa fa-pagelines"></i>
+    </a>
+</div>
+            
+
+            <!-- Footer -->
+            
+                <footer class="footer-wrapper col-xs-12 col-sm-12">
+    <div class="footer-banner-wrapper">
+        <p class="footer-banner">Powered by <a target="_blank" rel="noopener" href="https://hexo.io/" title="Hexo">Hexo</a></p>
+        <P class="footer-banner">Theme <a target="_blank" rel="noopener" href="https://github.com/Lonezj/hexo-theme-wind" title="Wind">wind</a></P>
+    </div>
+</footer>
+            
+        </div>
+
+        <link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css">
+        <link rel="stylesheet" href="/css/google-prettify-monokai.css" type="text/css">
+        <script src="//cdn.bootcss.com/prettify/r298/prettify.min.js" type="text/javascript"></script>
+    </body>
+</html>
